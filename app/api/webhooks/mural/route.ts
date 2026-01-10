@@ -63,6 +63,8 @@ export async function POST(request: NextRequest) {
   try {
     const reqBody: WebhookEventRequestBody = await request.json()
     const payload: WebhookPayload = reqBody.payload
+    
+    console.log('Full webhook payload:', JSON.stringify(reqBody, null, 2))
     console.log('Received webhook:', { type: payload.type })
     
     // Handle account credited events
