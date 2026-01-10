@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import crypto from 'crypto'
 import db from '../../../../lib/db'
 import { executePayoutRequest, initiatePayoutToCOP} from '../../payouts/service'
 
@@ -58,10 +59,62 @@ interface WebhookEventRequestBody {
   payload: WebhookPayload;
 }
 
+function verifyMuralWebhook(
+  requestBody: string,
+  signature: string,
+  timestamp: string,
+  publicKey: string
+): boolean {
+  try {
+    // Construct the message that was signed
+    const messageToSign = `${timestamp}.${requestBody}`
+    
+    // Decode the base64 signature
+    const signatureBuffer = Buffer.from(signature, 'base64')
+    
+    // Verify the ECDSA signature using the public key
+    const isValid = crypto.verify(
+      'sha256',
+      Buffer.from(messageToSign),
+      {
+        key: publicKey,
+        dsaEncoding: 'der',
+      },
+      signatureBuffer
+    )
+    return isValid
+  } catch (error) {
+    console.error('Signature verification failed:', error)
+    return false
+  }
+}
+
 
 export async function POST(request: NextRequest) {
   try {
-    const reqBody: WebhookEventRequestBody = await request.json()
+    // Get headers for webhook validation
+    const signature = request.headers.get('x-mural-webhook-signature')
+    const timestamp = request.headers.get('x-mural-webhook-timestamp')
+    
+    // Get raw body for signature verification
+    const rawBody = await request.text()
+    
+    // Validate webhook signature if headers are present
+    if (signature && timestamp && process.env.MURAL_WEBHOOK_PUBLIC_KEY) {
+      const isValid = verifyMuralWebhook(
+        rawBody,
+        signature,
+        timestamp,
+        process.env.MURAL_WEBHOOK_PUBLIC_KEY
+      )
+      
+      if (!isValid) {
+        console.error('Invalid webhook signature')
+        return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
+      }
+    }
+    
+    const reqBody: WebhookEventRequestBody = JSON.parse(rawBody)
     const payload: WebhookPayload = reqBody.payload
     
     console.log('Full webhook payload:', JSON.stringify(reqBody, null, 2))

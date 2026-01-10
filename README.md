@@ -1,36 +1,55 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Next.js E-commerce App with Mural Pay Integration
 
-## Getting Started
+## Live Demo
+The app is deployed on Vercel and can be viewed at: https://next-app-six-mu.vercel.app/
 
-First, run the development server:
+## Implemented Pages
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+### Frontend Pages
+- **Home Page** (`/`) - Product catalog with add to cart functionality
+- **Cart Page** (`/cart`) - Shopping cart with checkout modal and order creation
+- **Orders Page** (`/orders`) - View all orders with status tracking
+- **Withdrawals Page** (`/withdrawals`) - View all payouts and their statuses
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### API Endpoints
+- **Orders API** (`/api/orders`) - Create and retrieve orders
+- **Webhooks API** (`/api/webhooks/mural`) - Handle Mural Pay webhook events
+- **Withdrawals API** (`/api/withdrawals`) - Retrieve payout information
+- **Payouts Service** (`/api/payouts/service`) - Initiate and execute payouts
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Features
+- Product catalog with shopping cart
+- Order creation with USDC payment instructions
+- Webhook handling for payment confirmations
+- Automatic payout initiation to Colombian Pesos (COP)
+- SQLite database for order and payout persistence
+- Real-time status updates via webhooks
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Database
+Uses JSON file-based storage (originally SQLite, switched for serverless compatibility):
+- **Storage Location**: `/tmp/data.json` in production, local file in development
+- **Tables/Collections**:
+  - `orders` - Customer orders and payment status
+  - `payouts` - Payout requests and execution status
+- **Rationale**: Switched from SQLite to JSON file storage to avoid `SQLITE_READONLY` errors in serverless deployment environments
 
-## Learn More
+## Cart Storage
+- **Client-side storage**: Uses browser localStorage to persist cart items
+- **Data structure**: Array of cart items with id, name, price, and quantity
+- **Persistence**: Cart data survives browser refresh and session changes
+- **Clearing**: Cart is automatically cleared after successful order creation
 
-To learn more about Next.js, take a look at the following resources:
+## Order Processing & Payment Flow
+- **Order Creation**: Orders are persisted to JSON database with 'pending' status and unique payment reference
+- **Payment Detection**: Mural Pay webhooks (`account_credited`) detect incoming USDC payments and match them to pending orders by amount
+- **Order Updates**: Successful payments automatically update order status from 'pending' to 'paid' in the database
+- **Payout Automation**: Paid orders trigger automatic payout initiation to Colombian Pesos (COP)
+- **Payout Tracking**: Webhook events (`payout_request_status_changed`, `payout_status_changed`) update payout status in real-time
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Limitations & Improvements
+- **Payment Matching**: Currently uses payment amount to match payins against orders. Generating unique wallet addresses for each order would allow the system to easily identify which payin corresponds to each specific order. This would also prevent unmatched payins from getting stuck in the account as we could identify overpayments and underpayments, then handle these issues by refunding or requesting additional funds
+- **Database**: Integrate with a deployed datastore such as PostgreSQL or MySQL for better scalability and persistence
+- **Authentication**: Add login page to prevent unauthorized access to orders and withdrawals pages
+- **Error Handling**: Revised error handling and retry mechanisms for API calls and webhook processing
+- **Webhook Reliability**: Since orders and payouts are stored within the system and updates rely solely on webhook API calls, failed webhook requests can leave orders or withdrawals stuck in pending state. Add a periodic sync mechanism to check Mural Pay APIs for payin/payout status updates to ensure all information stored within the app remains up to date
+- **UI/UX**: Improve the styling and user interface design of the application
