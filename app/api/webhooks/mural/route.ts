@@ -144,20 +144,20 @@ async function handleAccountCredited(payload: AccountCreditedPayload) {
         transactionId: payload.transactionId
       })
       
-      // // Execute payout if initiation was successful
-      // if (payoutResult && payoutResult.id && payoutResult.status !== 'failed') {
-      //   const executeResult = await executePayoutRequest(payoutResult.id)
+      // Execute payout if initiation was successful
+      if (payoutResult && payoutResult.id && payoutResult.status !== 'failed') {
+        const executeResult = await executePayoutRequest(payoutResult.id)
         
-      //   // Update payout status based on execution result
-      //   if (executeResult) {
-      //     const payout = payouts.get(payoutResult.id)
-      //     if (payout) {
-      //       payout.status = executeResult.status || 'pending'
-      //       payout.updatedAt = new Date().toISOString()
-      //       payouts.set(payoutResult.id, payout)
-      //     }
-      //   }
-      // }
+        // Update payout status based on execution result
+        if (executeResult) {
+          const updatePayout = db.prepare('UPDATE payouts SET status = ?, updated_at = ? WHERE id = ?')
+          await updatePayout.run(
+            executeResult.status || 'pending',
+            new Date().toISOString(),
+            payoutResult.id
+          )
+        }
+      }
       
       return NextResponse.json({ 
         success: true, 
