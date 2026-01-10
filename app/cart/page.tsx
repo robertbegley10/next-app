@@ -63,7 +63,7 @@ const CartPage = () => {
         </div>
         <button 
           className="btn btn-primary" 
-          onClick={()=>document.getElementById('checkout')?.showModal()}
+          onClick={()=>(document.getElementById('checkout') as HTMLDialogElement)?.showModal()}
         >
           Checkout
         </button>
@@ -147,7 +147,7 @@ const CartPage = () => {
                 onClick={() => {
                   setOrderResult(null)
                   setEmail('')
-                  document.getElementById('checkout')?.close()
+                  ;(document.getElementById('checkout') as HTMLDialogElement)?.close()
                 }}
               >
                 Close
