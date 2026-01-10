@@ -130,12 +130,14 @@ export async function POST(request: NextRequest) {
       console.log('Payout request status changed:', payload.statusChangeDetails)
       
       // Update payout status in database
-      const updatePayout = db.prepare('UPDATE payouts SET status = ?, updated_at = ? WHERE id = ?')
-      await updatePayout.run(
-        payload.statusChangeDetails.currentStatus.type,
-        new Date().toISOString(),
-        payload.payoutRequestId
-      )
+      await db.execute({
+        sql: 'UPDATE payouts SET status = ?, updated_at = ? WHERE id = ?',
+        args: [
+          payload.statusChangeDetails.currentStatus.type,
+          new Date().toISOString(),
+          payload.payoutRequestId
+        ]
+      })
       
       return NextResponse.json({ success: true, message: 'Payout request status updated' })
     }
@@ -148,12 +150,14 @@ export async function POST(request: NextRequest) {
       })
       
       // Update individual payout status in database
-      const updatePayout = db.prepare('UPDATE payouts SET status = ?, updated_at = ? WHERE id = ?')
-      await updatePayout.run(
-        payload.statusChangeDetails.currentStatus.type,
-        new Date().toISOString(),
-        payload.payoutRequestId
-      )
+      await db.execute({
+        sql: 'UPDATE payouts SET status = ?, updated_at = ? WHERE id = ?',
+        args: [
+          payload.statusChangeDetails.currentStatus.type,
+          new Date().toISOString(),
+          payload.payoutRequestId
+        ]
+      })
       
       return NextResponse.json({ success: true, message: 'Payout status updated' })
     }
@@ -178,15 +182,20 @@ async function handleAccountCredited(payload: AccountCreditedPayload) {
     }
     
     // Find matching order by amount and status
-    const getMatchingOrder = db.prepare('SELECT * FROM orders WHERE total = ? AND status = ? LIMIT 1')
-    const matchedOrder = await getMatchingOrder.get(payload.tokenAmount.tokenAmount, 'pending') as any
+    const result = await db.execute({
+      sql: 'SELECT * FROM orders WHERE total = ? AND status = ? LIMIT 1',
+      args: [payload.tokenAmount.tokenAmount, 'pending']
+    })
+    const matchedOrder = result.rows[0] as any
     
     console.log(`Found matching order:`, matchedOrder)
 
     if (matchedOrder) {
       // Update order status in database
-      const updateOrder = db.prepare('UPDATE orders SET status = ? WHERE id = ?')
-      await updateOrder.run('paid', matchedOrder.id)
+      await db.execute({
+        sql: 'UPDATE orders SET status = ? WHERE id = ?',
+        args: ['paid', matchedOrder.id]
+      })
       
       console.log(`Order ${matchedOrder.id} marked as paid`)
       
@@ -203,12 +212,14 @@ async function handleAccountCredited(payload: AccountCreditedPayload) {
         
         // Update payout status based on execution result
         if (executeResult) {
-          const updatePayout = db.prepare('UPDATE payouts SET status = ?, updated_at = ? WHERE id = ?')
-          await updatePayout.run(
-            executeResult.status || 'pending',
-            new Date().toISOString(),
-            payoutResult.id
-          )
+          await db.execute({
+            sql: 'UPDATE payouts SET status = ?, updated_at = ? WHERE id = ?',
+            args: [
+              executeResult.status || 'pending',
+              new Date().toISOString(),
+              payoutResult.id
+            ]
+          })
         }
       }
       

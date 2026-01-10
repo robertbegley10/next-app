@@ -12,10 +12,12 @@ export interface Payout {
 }
 
 export async function GET(request: NextRequest) {
-  const getAllPayouts = db.prepare('SELECT * FROM payouts ORDER BY created_at DESC')
-  const payoutList = await getAllPayouts.all() as any[]
+  const result = await db.execute({
+    sql: 'SELECT * FROM payouts ORDER BY created_at DESC',
+    args: []
+  })
   
-  const formattedPayouts = payoutList.map(payout => ({
+  const formattedPayouts = result.rows.map((payout: any) => ({
     payoutRequestId: payout.id,
     orderId: payout.order_id,
     amount: payout.amount,

@@ -25,6 +25,3 @@ export interface Payout {
   updatedAt: string
 }
 
-// Shared Maps
-export const orders: Map<string, Order> = new Map()
-export const payouts: Map<string, Payout> = new Map()

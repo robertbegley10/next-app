@@ -22,16 +22,16 @@ The app is deployed on Vercel and can be viewed at: https://next-app-six-mu.verc
 - Order creation with USDC payment instructions
 - Webhook handling for payment confirmations
 - Automatic payout initiation to Colombian Pesos (COP)
-- SQLite database for order and payout persistence
+- Turso SQLite database for order and payout persistence
 - Real-time status updates via webhooks
 
 ## Database
-Uses JSON file-based storage (originally SQLite, switched for serverless compatibility):
-- **Storage Location**: `/tmp/data.json` in production, local file in development
-- **Tables/Collections**:
+Uses SQLite through Turso for serverless compatibility:
+- **Database Provider**: Turso (serverless SQLite)
+- **Tables**:
   - `orders` - Customer orders and payment status
   - `payouts` - Payout requests and execution status
-- **Rationale**: Switched from SQLite to JSON file storage to avoid `SQLITE_READONLY` errors in serverless deployment environments
+- **Connection**: Uses `@libsql/client` with environment variables for URL and auth token
 
 ## Cart Storage
 - **Client-side storage**: Uses browser localStorage to persist cart items
@@ -40,7 +40,7 @@ Uses JSON file-based storage (originally SQLite, switched for serverless compati
 - **Clearing**: Cart is automatically cleared after successful order creation
 
 ## Order Processing & Payment Flow
-- **Order Creation**: Orders are persisted to JSON database with 'pending' status and unique payment reference
+- **Order Creation**: Orders are persisted to SQLite database with 'pending' status and unique payment reference
 - **Payment Detection**: Mural Pay webhooks (`account_credited`) detect incoming USDC payments and match them to pending orders by amount
 - **Order Updates**: Successful payments automatically update order status from 'pending' to 'paid' in the database
 - **Payout Automation**: Paid orders trigger automatic payout initiation to Colombian Pesos (COP)

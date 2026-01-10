@@ -48,22 +48,20 @@ export async function POST(request: NextRequest) {
     const paymentReference = `REF_${orderId.slice(-8).toUpperCase()}`
     
     // Store order in database
-    const insertOrder = db.prepare(`
-      INSERT INTO orders (id, items, total, customer_email, payment_address, payment_reference, status, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `)
-    
     try {
-      await insertOrder.run(
-        orderId,
-        JSON.stringify(body.items),
-        body.total,
-        body.customerEmail || null,
-        process.env.MURAL_MAIN_ACCOUNT_ADDRESS!,
-        paymentReference,
-        'pending',
-        new Date().toISOString()
-      )
+      await db.execute({
+        sql: 'INSERT INTO orders (id, items, total, customer_email, payment_address, payment_reference, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        args: [
+          orderId,
+          JSON.stringify(body.items),
+          body.total,
+          body.customerEmail || null,
+          process.env.MURAL_MAIN_ACCOUNT_ADDRESS!,
+          paymentReference,
+          'pending',
+          new Date().toISOString()
+        ]
+      })
     } catch (dbError) {
       console.error('Database insert error:', dbError)
       return NextResponse.json({ error: 'Failed to save order' }, { status: 500 })
@@ -91,8 +89,11 @@ export async function GET(request: NextRequest) {
   
   // If orderId is provided, return specific order
   if (orderId) {
-    const getOrder = db.prepare('SELECT * FROM orders WHERE id = ?')
-    const order = await getOrder.get(orderId) as DbOrder | undefined
+    const result = await db.execute({
+      sql: 'SELECT * FROM orders WHERE id = ?',
+      args: [orderId]
+    })
+    const order = result.rows[0] as unknown as DbOrder | undefined
     
     if (!order) {
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
@@ -111,8 +112,11 @@ export async function GET(request: NextRequest) {
   }
   
   // Otherwise, return all orders
-  const getAllOrders = db.prepare('SELECT * FROM orders ORDER BY created_at DESC')
-  const orders = await getAllOrders.all() as DbOrder[]
+  const result = await db.execute({
+    sql: 'SELECT * FROM orders ORDER BY created_at DESC',
+    args: []
+  })
+  const orders = result.rows as unknown as DbOrder[]
   
   const formattedOrders = orders.map((order: DbOrder) => ({
     orderId: order.id,

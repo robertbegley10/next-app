@@ -97,20 +97,18 @@ export async function initiatePayoutToCOP(paymentData: {
       const failedPayoutId = `failed_${Date.now()}_${paymentData.orderId}`
       
       // Store failed payout in database
-      const insertFailedPayout = db.prepare(`
-        INSERT INTO payouts (id, order_id, amount, currency, status, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-      `)
-      
-      await insertFailedPayout.run(
-        failedPayoutId,
-        paymentData.orderId,
-        paymentData.amount,
-        paymentData.currency,
-        'failed',
-        new Date().toISOString(),
-        new Date().toISOString()
-      )
+      await db.execute({
+        sql: 'INSERT INTO payouts (id, order_id, amount, currency, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        args: [
+          failedPayoutId,
+          paymentData.orderId,
+          paymentData.amount,
+          paymentData.currency,
+          'failed',
+          new Date().toISOString(),
+          new Date().toISOString()
+        ]
+      })
       
       return { id: failedPayoutId, status: 'failed', error: errorText }
     }
@@ -122,20 +120,18 @@ export async function initiatePayoutToCOP(paymentData: {
     })
     
     // Store successful payout in database
-    const insertPayout = db.prepare(`
-      INSERT INTO payouts (id, order_id, amount, currency, status, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `)
-    
-    await insertPayout.run(
-      payoutResult.id,
-      paymentData.orderId,
-      paymentData.amount,
-      paymentData.currency,
-      'created',
-      new Date().toISOString(),
-      new Date().toISOString()
-    )
+    await db.execute({
+      sql: 'INSERT INTO payouts (id, order_id, amount, currency, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
+      args: [
+        payoutResult.id,
+        paymentData.orderId,
+        paymentData.amount,
+        paymentData.currency,
+        'created',
+        new Date().toISOString(),
+        new Date().toISOString()
+      ]
+    })
     
     return payoutResult
     
