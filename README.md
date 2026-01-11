@@ -98,6 +98,7 @@ Uses SQLite through Turso for serverless compatibility:
 
 ## Limitations & Improvements
 - **Payment Matching**: Currently uses payment amount to match payins against orders. Generating unique wallet addresses for each order would allow the system to easily identify which payin corresponds to each specific order. This would also prevent unmatched payins from getting stuck in the account as we could identify overpayments and underpayments, then handle these issues by refunding or requesting additional funds
+- **Account Configuration**: Account and bank details are currently hardcoded in payout requests. These should be dynamically retrieved from Mural Pay APIs to ensure accuracy and support multiple accounts or configurations
 - **Database**: Integrate with a deployed datastore such as PostgreSQL or MySQL for better scalability and persistence
 - **Authentication**: Add login page to prevent unauthorized access to orders and withdrawals pages
 - **Error Handling**: Revised error handling and retry mechanisms for API calls and webhook processing
