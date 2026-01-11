@@ -3,6 +3,16 @@ import crypto from 'crypto'
 import DATABASE_CLIENT from '../../../../lib/db'
 import { executePayoutRequest, initiatePayoutToCOP } from '../../payouts/service'
 
+// Webhook Types
+interface WebhookEventRequestBody {
+  eventId: string
+  deliveryId: string
+  attemptNumber: number
+  eventCategory: 'MURAL_ACCOUNT_BALANCE_ACTIVITY' | 'PAYOUT_REQUEST'
+  occurredAt: string
+  payload: WebhookPayload
+}
+
 interface AccountCreditedPayload {
   type: 'account_credited'
   accountId: string
@@ -46,18 +56,7 @@ interface PayoutStatusChangedPayload {
   }
 }
 
-type WebhookPayload = AccountCreditedPayload | PayoutRequestStatusChangedPayload | PayoutStatusChangedPayload
-
-type MuralEventCategory = 'MURAL_ACCOUNT_BALANCE_ACTIVITY' | 'PAYOUT_REQUEST'
-
-interface WebhookEventRequestBody {
-  eventId: string
-  deliveryId: string
-  attemptNumber: number
-  eventCategory: MuralEventCategory
-  occurredAt: string // ISO 8601 datetime
-  payload: WebhookPayload
-}
+export type WebhookPayload = AccountCreditedPayload | PayoutRequestStatusChangedPayload | PayoutStatusChangedPayload
 
 /**
  * Verify Mural webhook signature (currently disabled)

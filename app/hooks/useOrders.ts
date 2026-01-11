@@ -1,16 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { CartItem } from '../../lib/types'
-
-interface OrderResponse {
-  orderId: string
-  paymentAddress: string
-  paymentReference: string
-  amount: string
-  currency: string
-  status: string
-  message: string
-}
+import { CartItem, OrderResponse } from '../../lib/types'
 
 interface OrderHookReturn {
   createOrder: (items: CartItem[], total: number, customerEmail?: string) => Promise<OrderResponse | null>

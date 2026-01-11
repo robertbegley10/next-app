@@ -1,25 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import DATABASE_CLIENT from '../../../lib/db'
+import { Payout } from '../../../lib/types'
+import { DatabasePayout } from '../../../lib/db'
 
-export interface Payout {
-  payoutRequestId: string
-  orderId: string
-  amount: number
-  currency: string
-  status: 'created' | 'awaitingExecution' | 'pending' | 'executed' | 'failed' | 'canceled'
-  createdAt: string
-  updatedAt: string
-}
-
-interface DatabasePayout {
-  id: string
-  order_id: string
-  amount: number
-  currency: string
-  status: string
-  created_at: string
-  updated_at: string
-}
 
 /**
  * Retrieve all payouts/withdrawals

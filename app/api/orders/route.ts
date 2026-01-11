@@ -1,28 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import DATABASE_CLIENT from '../../../lib/db'
-
-interface CartItem {
-  id: number
-  name: string
-  price: number
-  quantity: number
-}
+import { CartItem } from '../../../lib/types'
+import { DatabaseOrder } from '../../../lib/db'
 
 interface CreateOrderRequest {
   items: CartItem[]
   total: number
   customerEmail?: string
-}
-
-interface DatabaseOrder {
-  id: string
-  items: string
-  total: number
-  customer_email: string | null
-  payment_address: string
-  payment_reference: string
-  status: string
-  created_at: string
 }
 
 /**

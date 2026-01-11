@@ -1,5 +1,27 @@
 import { createClient } from '@libsql/client'
 
+// Database Types
+export interface DatabaseOrder {
+  id: string
+  items: string // JSON stringified CartItem[]
+  total: number
+  customer_email: string | null
+  payment_address: string
+  payment_reference: string
+  status: string
+  created_at: string
+}
+
+export interface DatabasePayout {
+  id: string
+  order_id: string
+  amount: number
+  currency: string
+  status: string
+  created_at: string
+  updated_at: string
+}
+
 const DATABASE_CLIENT = createClient({
   url: process.env.TURSO_DATABASE_URL!,
   authToken: process.env.TURSO_AUTH_TOKEN!

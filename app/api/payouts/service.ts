@@ -1,16 +1,11 @@
 import DATABASE_CLIENT from '../../../lib/db'
+import { PayoutResult } from '../../../lib/types'
 
-interface PayoutRequestData {
+export interface PayoutRequestData {
   amount: number
   currency: string
   orderId: string
   transactionId: string
-}
-
-interface PayoutResult {
-  id: string
-  status: string
-  error?: string
 }
 
 interface MuralPayoutRequest {

@@ -1,22 +1,6 @@
 'use client'
 import { createContext, useContext, useReducer, ReactNode } from 'react'
-
-interface CartItem {
-  id: number
-  name: string
-  price: number
-  quantity: number
-}
-
-interface CartState {
-  items: CartItem[]
-  total: number
-}
-
-type CartAction = 
-  | { type: 'ADD_ITEM'; payload: Omit<CartItem, 'quantity'> }
-  | { type: 'REMOVE_ITEM'; payload: number }
-  | { type: 'CLEAR_CART' }
+import { CartItem, CartState, CartAction } from '../../lib/types'
 
 const CartContext = createContext<{
   state: CartState
