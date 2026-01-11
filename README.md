@@ -3,6 +3,56 @@
 ## Live Demo
 The app is deployed on Vercel and can be viewed at: https://next-app-six-mu.vercel.app/
 
+## Setup Instructions
+
+### Prerequisites
+- Node.js 18+ installed
+- npm or yarn package manager
+- Mural Pay API credentials
+- Turso database account (optional - will use local SQLite if not configured)
+
+### Installation
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd next-app
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Create environment variables:
+   ```bash
+   cp .env.example .env.local
+   ```
+   
+   Configure the following variables in `.env.local`:
+   ```
+    MURAL_API_KEY
+    MURAL_TRANSFER_API_KEY
+    MURAL_ORGANIZATION_ID
+    MURAL_SOURCE_ACCOUNT_ID
+    MURAL_API_BASE_URL
+    MURAL_MAIN_ACCOUNT_ADDRESS
+    MURAL_WEBHOOK_PUBLIC_KEY
+    TURSO_AUTH_TOKEN
+    TURSO_DATABASE_URL
+   ```
+
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+
+5. Open [http://localhost:3000](http://localhost:3000) in your browser
+
+### Database Setup
+- If Turso credentials are provided, the app will use Turso SQLite
+- If not configured, it will create a local `data.db` file
+- Database tables are automatically initialized on first run
+
 ## Implemented Pages
 
 ### Frontend Pages
