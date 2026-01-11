@@ -1,14 +1,16 @@
 import { createClient } from '@libsql/client'
 
-const client = createClient({
+const DATABASE_CLIENT = createClient({
   url: process.env.TURSO_DATABASE_URL!,
   authToken: process.env.TURSO_AUTH_TOKEN!
 })
 
-// Initialize tables
-async function initializeTables() {
+/**
+ * Initialize database tables on module load
+ */
+async function initializeDatabaseTables(): Promise<void> {
   try {
-    await client.execute(`
+    await DATABASE_CLIENT.execute(`
       CREATE TABLE IF NOT EXISTS orders (
         id TEXT PRIMARY KEY,
         items TEXT NOT NULL,
@@ -21,7 +23,7 @@ async function initializeTables() {
       )
     `)
     
-    await client.execute(`
+    await DATABASE_CLIENT.execute(`
       CREATE TABLE IF NOT EXISTS payouts (
         id TEXT PRIMARY KEY,
         order_id TEXT NOT NULL,
@@ -34,10 +36,11 @@ async function initializeTables() {
     `)
   } catch (error) {
     console.error('Database initialization error:', error)
+    throw error
   }
 }
 
 // Initialize tables on module load
-initializeTables()
+initializeDatabaseTables()
 
-export default client
+export default DATABASE_CLIENT

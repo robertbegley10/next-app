@@ -23,7 +23,7 @@ const WithdrawalsPage = () => {
   const fetchPayouts = async () => {
     try {
       const response = await fetch('/api/withdrawals')
-      if (!response.ok) throw new Error('Failed to fetch payouts')
+      if (!response.ok) throw new Error('Failed to fetch withdrawls')
       const data = await response.json()
       setPayouts(data)
     } catch (err) {
@@ -61,7 +61,7 @@ const WithdrawalsPage = () => {
 
   return (
     <main className="container mx-auto px-6 py-8">
-      <h1 className="text-2xl font-bold mb-6">Payouts</h1>
+      <h1 className="text-2xl font-bold mb-6">Withdrawals</h1>
       
       {error && (
         <div className="alert alert-error mb-6">
@@ -71,7 +71,7 @@ const WithdrawalsPage = () => {
 
       {payouts.length === 0 ? (
         <div className="text-center py-8">
-          <p className="text-lg text-base-content/70">No payouts found</p>
+          <p className="text-lg text-base-content/70">No withdrawals found</p>
         </div>
       ) : (
         <div className="overflow-x-auto">
