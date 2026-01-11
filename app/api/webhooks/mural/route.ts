@@ -129,7 +129,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         return await handlePayoutStatusChanged(payload)
       
       default:
-        console.warn('Unknown webhook type:', payload.type)
+        console.warn('Unknown webhook type')
         return NextResponse.json(
           { error: 'Unknown webhook type' }, 
           { status: 400 }
