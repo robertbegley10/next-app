@@ -52,5 +52,7 @@ Uses SQLite through Turso for serverless compatibility:
 - **Authentication**: Add login page to prevent unauthorized access to orders and withdrawals pages
 - **Error Handling**: Revised error handling and retry mechanisms for API calls and webhook processing
 - **Webhook Reliability**: Since orders and payouts are stored within the system and updates rely solely on webhook API calls, failed webhook requests can leave orders or withdrawals stuck in pending state. Add a periodic sync mechanism to check Mural Pay APIs for payin/payout status updates to ensure all information stored within the app remains up to date
+- **Webhook Processing**: Webhook requests should immediately acknowledge receipt and perform all processing asynchronously in the background to prevent timeouts and ensure reliable delivery
+- **Real-time Updates**: No mechanism exists to push updates to the client when order/payout status changes. Implemented refresh button due to time constraints - should add WebSocket or Server-Sent Events for real-time status updates
 - **Webhook Security**: Webhook signature validation was skipped due to time constraints and should be implemented for production use
 - **UI/UX**: Improve the styling and user interface design of the application
