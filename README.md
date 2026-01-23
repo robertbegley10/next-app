@@ -6,7 +6,7 @@ The app is deployed on Vercel and can be viewed at: https://next-app-six-mu.verc
 ## Setup Instructions
 
 ### Prerequisites
-- Node.js 18+ installed
+- Node.js 18+ installed.
 - npm or yarn package manager
 - Mural Pay API credentials
 - Turso database account (optional - will use local SQLite if not configured)
